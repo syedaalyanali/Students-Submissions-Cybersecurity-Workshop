@@ -1,0 +1,8 @@
+How it can be exploited:
+The application constructs an SQL query by directly embedding user input (username and password) into a string. An attacker can provide a specially crafted username, such as "' OR '1'='1", and any password. The final query becomes "SELECT id FROM users WHERE username = '' OR '1'='1' AND password = '...'", which always evaluates to true, allowing the attacker to log in as the first user (alice) without a valid password.
+
+Remediation:
+Never build SQL queries with string formatting (f-strings or concatenation). Use parameterized queries (also known as prepared statements), which send the query structure and the user data to the database separately.
+
+Replace the vulnerable f-string query with a parameterized one. Change the `c.execute(query)` line to:
+c.execute("SELECT id FROM users WHERE username = ? AND password = ?", (username, password))

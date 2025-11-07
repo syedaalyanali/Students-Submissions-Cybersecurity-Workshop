@@ -1,0 +1,8 @@
+How it can be exploited:
+The application passes user input directly to a shell command using `shell=True`. An attacker can inject arbitrary OS commands using a separator like ';' or '&&'. For example, submitting the host "127.0.0.1; ls -la" would first ping localhost and then execute "ls -la", displaying the directory contents to the attacker.
+
+Remediation:
+Avoid `shell=True` whenever possible. Pass the command and its arguments as a list to `subprocess.check_output`. This ensures that user input is treated as a single, non-executable argument, not as part of the command itself.
+
+Change the `subprocess.check_output` call to pass arguments as a list and remove `shell=True`:
+output = subprocess.check_output(["ping", "-c", "1", host], stderr=subprocess.STDOUT, universal_newlines=True)

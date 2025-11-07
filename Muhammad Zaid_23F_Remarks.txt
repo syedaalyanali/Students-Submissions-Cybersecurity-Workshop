@@ -1,0 +1,19 @@
+How it can be exploited:
+The `/profile` route uses the `id` parameter from the URL to fetch a user's profile without checking if the *currently logged-in user* is authorized to see it. A logged-in user (e.g., 'user1' with profile ID '1') can simply change the URL to `/profile?id=2` or `/profile?id=3` to view the private profile information (name and email) of other users.
+
+Remediation:
+The application must perform an authorization check. Instead of trusting the `id` parameter from the URL, the application should fetch the profile information based on the user's ID stored in the secure, server-side session.
+
+Modify the `/profile` route to ignore the URL parameter and only use the ID from the session:
+@app.route('/profile')
+def profile():
+    if 'uid' not in session:
+        return redirect(url_for('index'))
+    
+    # VULNERABILITY REMOVED: Use session 'uid' instead of request.args.get('id')
+    pid = session.get('uid') 
+    
+    if pid in profiles:
+        p = profiles[pid]
+        return f"<h3>Profile {pid}</h3>Name: {p['name']}<br>Email: {p['email']}<br><a href='/'>Home</a>"
+    return "Profile not found. <a href='/'>Home</a>"

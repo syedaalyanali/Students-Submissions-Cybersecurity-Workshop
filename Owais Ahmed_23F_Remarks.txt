@@ -1,0 +1,6 @@
+This code is not vulnerable; it demonstrates a secure login and user authentication system.
+Security Controls Implemented:
+1.  **SQL Injection Prevention**: It uses parameterized queries (`c.execute("... WHERE username = ?", (username,))`). This is the correct way to interact with a database, as it separates the SQL command from user data, making SQLi impossible.
+2.  **Secure Password Storage**: It uses `bcrypt.hashpw()` to create a strong, salted hash of the user's password for storage. When logging in, it uses `bcrypt.checkpw()` to compare the provided password against the stored hash. This is the industry standard and protects user passwords even if the database is stolen.
+3.  **Secure Session Management**: It uses server-side sessions (`session['user'] = username`) to track the authenticated user, which is safer than client-side tokens for this simple case.
+This file correctly implements two of the most critical security controls for a web application: preventing SQLi and securely hashing user passwords.

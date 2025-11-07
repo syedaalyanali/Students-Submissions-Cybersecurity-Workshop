@@ -1,0 +1,5 @@
+This code is not vulnerable; it demonstrates a secure file upload mechanism.
+Security Controls Implemented:
+1.  **Filename Sanitization**: It uses `werkzeug.utils.secure_filename(f.filename)`. This function is crucial as it sanitizes the filename, removing directory traversal characters (like '../') and other problematic symbols. This prevents an attacker from saving a file outside the intended 'uploads' directory (e.g., '../../etc/passwd').
+2.  **Extension Allow-Listing**: It strictly checks the file extension against a predefined `ALLOWED` set ({'txt', 'pdf', 'png', 'jpg'}). This is a strong security practice that prevents attackers from uploading potentially executable files (like .php, .sh, .py, or .exe).
+This code correctly implements a defense-in-depth approach for file uploads by combining filename sanitization with a strict extension allow-list.

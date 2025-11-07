@@ -1,0 +1,10 @@
+How it can be exploited:
+The application renders user-supplied comments using the `| safe` filter in the Jinja2 template. This filter explicitly disables the template engine's automatic HTML escaping. An attacker can post a comment containing a malicious script, like "<script>alert('XSS');</script>". This script is then stored in the database (or in this case, the `comments` list) and executed in the browser of every user who views the page.
+
+Remediation:
+Remove the `| safe` filter to re-enable Jinja2's default auto-escaping. This will treat the script tags as plain text, rendering them harmlessly on the page instead of executing them.
+
+Modify the template string `PAGE`. Change the vulnerable line from:
+<div><strong>{{ nm }}</strong>: {{ cm | safe }}</div>
+...to:
+<div><strong>{{ nm }}</strong>: {{ cm }}</div>

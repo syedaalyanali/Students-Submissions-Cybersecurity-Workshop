@@ -1,0 +1,6 @@
+This code is not vulnerable; it demonstrates a secure comment application.
+Security Controls Implemented:
+1.  **XSS Prevention**: It uses `markupsafe.escape()` on all user-supplied input (`name` and `comment`) before storing it. This (or the default Jinja2 auto-escaping) is the correct way to neutralize HTML and script tags, preventing Stored XSS attacks.
+2.  **Rate Limiting**: It implements a basic per-session rate limit (`POST_INTERVAL`) to prevent a single user from spamming the comment board with automated requests.
+3.  **Input Validation**: It enforces a `MAX_COMMENT_LEN` to prevent denial-of-service or data spam attacks and checks that the comment is not empty.
+This code is a good example of a secure-by-default application, implementing controls for XSS, rate-limiting, and input validation.

@@ -1,0 +1,3 @@
+This file is not vulnerable and has no "exploit."
+It is an educational tool designed to *teach* users how to identify a phishing email. It simulates a phishing landing page for training purposes.
+The application's purpose is purely defensive and educational, helping users build resilience against real-world phishing attacks.

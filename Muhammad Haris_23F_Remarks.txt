@@ -1,0 +1,6 @@
+This is a command-line (console) program, not a web application, and it is not vulnerable.
+Security Controls Implemented:
+1.  **Strong Password Policy**: The `valid_password` function enforces a good policy (length, digit, uppercase, special character), which is a key part of user account security.
+2.  **Secure Password Input**: It uses `getpass.getpass()` to read the password, which prevents the password from being echoed to the screen (no "shoulder surfing").
+3.  **Secure Password Storage**: It demonstrates the correct use of `bcrypt.hashpw()` to hash the password before it would be (hypothetically) stored, protecting the user's plain-text password.
+This code correctly demonstrates best practices for handling password creation in an application.
