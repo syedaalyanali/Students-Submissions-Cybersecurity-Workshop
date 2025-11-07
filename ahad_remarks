@@ -1,0 +1,4 @@
+How it can be exploited (vulnerability):
+The app builds an SQL statement by directly inserting user input into the query string. An attacker can supply specially crafted input (for example, a password like ' OR 1=1--) that changes the query logic so the WHERE clause always evaluates true. Because the database executes the final text unchanged, the attacker can bypass authentication and access the secret page without valid credentials.
+Remediation:
+Stop mixing user input with SQL text. Use parameterized queries (prepared statements) so user values are passed separately from the SQL command, and store passwords as secure hashes rather than plaintext. With parameterized queries the database treats inputs strictly as data, preventing injected text from altering query logic.
