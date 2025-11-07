@@ -1,0 +1,5 @@
+How it can be exploited:
+Attackers craft links to this site that redirect victims to malicious pages (e.g., https://trusted.app/go?next=https://evil.example) — victims trust the initial domain and click, then get sent to phishing pages.
+
+Remediation:
+Validate the next parameter against a whitelist of allowed hosts or only accept relative paths. Use an internal redirect route that checks targets and refuses external domains.
