@@ -1,0 +1,5 @@
+How it can be exploited (vulnerability):
+This app stores user comments and then renders them back into the page without escaping; the template uses |safe which tells the browser to execute any HTML/JavaScript in the comment. An attacker can submit a comment like <script>alert('XSS')</script> (or an <img onerror=...> payload). When other users load the comments page, the injected script runs in their browsers, allowing cookie theft, session hijacking, or performing actions on behalf of victims.
+
+Remediation:
+Stop rendering untrusted input as HTML. Remove the |safe filter and rely on template auto-escaping (e.g., render {{ c }} without |safe), or explicitly escape input with a safe library. For richer input, use a strict HTML sanitizer that allows only a small allow-list of tags. Add Content-Security-Policy headers to reduce impact (e.g., disallow inline scripts) and enforce input length limits and validation. Always test fixes in a safe, local environment.
