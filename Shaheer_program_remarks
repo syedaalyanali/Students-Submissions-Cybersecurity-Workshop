@@ -1,0 +1,5 @@
+How it can be exploited:
+An attacker can host a malicious page that submits a POST to /change (for example via an auto-submitting form) while a victim is logged into this app — the app trusts the request and changes the victim’s password (CSRF attack).
+
+Remediation:
+Implement CSRF tokens (per-session random token embedded in forms and verified on POST), require SameSite cookies, and require re-authentication for sensitive actions.
