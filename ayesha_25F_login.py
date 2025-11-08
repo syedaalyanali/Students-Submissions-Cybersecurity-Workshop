@@ -1,75 +1,80 @@
-from flask import Flask, request, render_template_string, g
-import sqlite3
-import os
-from markupsafe import escape
+from flask import Flask, request, render_template_string, session, redirect, url_for
 
 app = Flask(__name__)
-DB = "secure_contact.db"
+app.secret_key = "dev-secret-key"
 
-def get_db():
-    if 'db' not in g:
-        g.db = sqlite3.connect(DB)
-        g.db.execute("PRAGMA foreign_keys = ON")
-    return g.db
+profiles = {
+    "1": {"name": "Alice", "email": "alice@example.com"},
+    "2": {"name": "Bob", "email": "bob@example.com"},
+    "3": {"name": "Charlie", "email": "charlie@example.com"}
+}
 
-def init_db():
-    need_seed = not os.path.exists(DB)
-    db = sqlite3.connect(DB)
-    db.execute('CREATE TABLE IF NOT EXISTS contacts (id INTEGER PRIMARY KEY, name TEXT, email TEXT, message TEXT)')
-    db.commit()
-    db.close()
+credentials = {
+    "alice": "alicepass",
+    "bob": "bobpass",
+    "charlie": "charliepass"
+}
 
-init_db()
-
-PAGE = """
+LOGIN_PAGE = """
 <!doctype html>
-<title>Secure Contact</title>
-<h2>Secure Contact Form</h2>
-<form method="post" action="/contact">
-  Name: <input name="name" maxlength="100"><br>
-  Email: <input name="email" maxlength="254"><br>
-  Message:<br>
-  <textarea name="message" rows="5" cols="40" maxlength="1000"></textarea><br>
-  <button type="submit">Send</button>
+<title>Login</title>
+<h2>Login</h2>
+<form method="post" action="/login">
+  Username: <input name="username"><br>
+  Password: <input name="password"><br>
+  <button type="submit">Login</button>
 </form>
-<h3>Recent messages</h3>
-<ul>
-  {% for c in contacts %}
-    <li><strong>{{ c[1] }}</strong> ({{ c[2] }}) — {{ c[3] }}</li>
-  {% endfor %}
-</ul>
-<p style="color:gray">Secure demo — local use</p>
+<p><a href="/profile">Go to profile</a></p>
 """
 
-@app.after_request
-def set_csp(response):
-    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; object-src 'none'"
-    return response
+PROFILE_PAGE = """
+<!doctype html>
+<title>Profile</title>
+<h2>Profile Viewer</h2>
+{% if user %}
+  <p>Viewing profile of: <strong>{{ user['name'] }}</strong></p>
+  <p>Email: {{ user['email'] }}</p>
+{% else %}
+  <p>No profile found.</p>
+{% endif %}
+<p>Logged in as: {{ logged_in }}</p>
+<p>To view another profile change the URL parameter `?id=` (e.g. /profile?id=2)</p>
+<p><a href="/logout">Logout</a></p>
+"""
 
 @app.route('/')
 def index():
-    db = get_db()
-    rows = db.execute("SELECT id, name, email, message FROM contacts ORDER BY id DESC LIMIT 10").fetchall()
-    safe_rows = [(r[0], escape(r[1]), escape(r[2]), escape(r[3])) for r in rows]
-    return render_template_string(PAGE, contacts=safe_rows)
+    return redirect(url_for('login'))
 
-@app.route('/contact', methods=['POST'])
-def contact():
-    name = request.form.get('name', '').strip()[:100]
-    email = request.form.get('email', '').strip()[:254]
-    message = request.form.get('message', '').strip()[:1000]
-    if not name or not email or not message:
-        return "<p>All fields are required. <a href='/'>Back</a></p>"
-    db = get_db()
-    db.execute("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)", (name, email, message))
-    db.commit()
-    return "<p>Message received. <a href='/'>Back</a></p>"
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        u = request.form.get('username', '')
+        p = request.form.get('password', '')
+        if credentials.get(u) == p:
+            if u == 'alice':
+                session['user_id'] = '1'
+            elif u == 'bob':
+                session['user_id'] = '2'
+            elif u == 'charlie':
+                session['user_id'] = '3'
+            return redirect(url_for('profile'))
+        return "<p>Login failed. <a href='/login'>Try again</a></p>"
+    return render_template_string(LOGIN_PAGE)
 
-@app.teardown_appcontext
-def close_db(exc):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
+@app.route('/profile')
+def profile():
+    logged_in = session.get('user_id', 'None')
+    req_id = request.args.get('id')
+    # Vulnerable behavior: trust client-supplied id and show that profile without authorization checks
+    show_id = req_id if req_id else logged_in
+    user = profiles.get(show_id)
+    return render_template_string(PROFILE_PAGE, user=user, logged_in=logged_in)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
