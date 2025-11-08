@@ -1,0 +1,5 @@
+How it can be exploited:
+Untrusted pickle data can execute arbitrary code during deserialization — an attacker-supplied payload can run commands on the server, leading to remote code execution.
+
+Remediation:
+Avoid pickle.loads on untrusted data. Use safe formats (JSON) or strict deserialization libraries that enforce types. If binary deserialization is required, use a safe, allow-list approach or sandboxed processing.
