@@ -1,0 +1,5 @@
+How it can be exploited:
+An attacker can make the server fetch internal resources (e.g., http://127.0.0.1:8000/ or http://169.254.169.254/) exposing internal metadata or services — SSRF can lead to data theft or pivoting into internal networks.
+
+Remediation:
+Validate and whitelist allowed domains/URLs, forbid IP addresses in private ranges, restrict outbound requests, or implement a proxy with strict rules. Never allow arbitrary URLs from untrusted users.
