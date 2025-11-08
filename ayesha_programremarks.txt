@@ -1,0 +1,5 @@
+How it can be exploited (vulnerability):
+After logging in as one user, an attacker can change the id parameter in the /profile URL (for example /profile?id=2) to view another user’s profile. The app trusts the client-supplied id and does not verify that the logged-in user is authorized to view that resource, allowing unauthorized access to other users' data.
+
+Remediation:
+Derive the profile to display from the server-side session (ignore any client id for sensitive views) or perform strict authorization checks that confirm the logged-in user has permission to access the requested resource. Use indirect references or access control checks on every request and avoid trusting client-provided identifiers for access decisions.
